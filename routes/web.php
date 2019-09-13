@@ -10,5 +10,14 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+//Auth
 Route::get('/', 'AuthController@index');
+Route::post('/checklogin', 'AuthController@checklogin');
+
+
+//Dashboard
+Route::group(['middleware'=>['checkauth']],function(){
+    Route::match(['get', 'post'],'/dashboard', 'DashboardController@index');
+    Route::get('/list', 'DashboardController@list');
+});
+

@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css?family=Catamaran:800&display=swap');
+
+body{
+    font-family: 'Catamaran', sans-serif;
+}
+.nav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #2d3135;
+    opacity: .9;
+    padding-top: 60px;
+    transition: 0.7s;
+    overflow: hidden;
+}
+.nav ul{
+    padding: 0;
+}
+.nav li:hover{
+    border-left:  10px solid #3e84c1;
+    background-color: #34383d;
+}
+.nav a {
+    display: block;
+    padding: 20px 50px;
+    color: #ccc;
+    text-decoration: none;
+    font-size: 16px;
+}
+.nav a:hover{
+    color: #fff;
+    transition: .4s;
+}
+.nav .close{
+    position: absolute;
+    top: 0;
+    right: 22px;
+    margin-left: 50px;
+    font-size: 30px;
+}
+.slide a {
+    font-size: 36px;
+    color: #2d3135;
+}
+#content{
+    padding: 20px;
+    transition: margin-left .7s;
+    overflow: hidden;
+    width: 20%;
+}
