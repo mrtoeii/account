@@ -26,23 +26,23 @@ class AuthController extends Controller
                     ->first();
 
         if($user && Hash::check($password,$user->password)){
-            echo 'Go to Dashboard';
+            // echo 'Go to Dashboard';
+            $userArr = array(
+                'username'=>$user->username,
+                'fname'=>$user->fname,
+                'lname'=>$user->lname,
+                'role'=>$user->role,
+            );
+            session()->put('user',$userArr);
+            return redirect('/dashboard');
+
+
         }else{
             echo 'Username or Password Incorrect';
         }
-
-
-        // $userArr = array(
-        //     'username'=>$username,
-        //     'password'=>$password
-        // );
-        // session()->put('user',$userArr);
-        // $session = session()->get('user');
-        // dd($session);
-        // echo "Username: ".$username.' , Password: '.$password ;
-        // return view('auth.login');
-        // if($username=='admin'&&$password=='admin'){
-        //     return redirect('/dashboard');
-        // }
+    }
+    public function logout(Request $req){
+        $req->session()->flush();
+        return  redirect('/');
     }
 }

@@ -1,12 +1,12 @@
 @extends('dashboard.dashboard_layouts')
 
-@section('title', 'List Account')
+@section('title', 'Profile')
 
 
 @section('content')
     <div class="container-fluid">
         <div class="row">
-            <div class="col">List Account</div>
+            <div class="col">Profile</div>
         </div>
     </div>
 

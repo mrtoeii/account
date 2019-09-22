@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,11 +12,22 @@
 //Auth
 Route::get('/', 'AuthController@index');
 Route::post('/checklogin', 'AuthController@checklogin');
+Route::get('/logout', 'AuthController@logout');
 
 
-//Dashboard
 Route::group(['middleware'=>['checkauth']],function(){
+    //Dashboard
     Route::match(['get', 'post'],'/dashboard', 'DashboardController@index');
-    Route::get('/list', 'DashboardController@list');
+
+    //Account
+    Route::get('/account', 'AccountController@index');
+    Route::match(['get', 'post'],'account.insert', 'AccountController@insert');
+
+    //Profile
+    Route::get('/profile', 'ProfileController@index');
+
+    //Users
+    Route::get('/users', 'UsersController@index');
 });
+
 
