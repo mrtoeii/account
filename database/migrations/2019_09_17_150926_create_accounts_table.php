@@ -16,13 +16,16 @@ class CreateAccountsTable extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('type');
+            $table->string('date');
             $table->string('list');
             $table->string('amount');
             $table->string('description');
             $table->string('receipt');
             $table->string('username');
             $table->string('status');
-            $table->timestamps();
+            $table->string('created');
+            $table->string('updated');
+
         });
     }
 

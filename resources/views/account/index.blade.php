@@ -6,8 +6,38 @@
 @section('content')
 
     <script type="text/javascript">
+
         $(document).ready(function(e){
+            $(document).on('click', '.pagination a', function(e) {
+                e.preventDefault();
+                var page = $(this).attr('href').split('page=')[1];
+                fetch_data(page);
+            });
+            function fetch_data(page) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                $.ajax({
+                    url: "{{url('account.fetch_data?page= ')}}"+page,
+                    type:"POST",
+                    // data:{
+                    //     total : txt
+                    // },
+                    success: function(data) {
+                        $('#table_data').html(data);
+                        $('#page_list').val(page);
+
+                    }
+                });
+            }
+            $('#date').datepicker({
+                uiLibrary: 'bootstrap4',
+                format: 'dd-mm-yyyy '
+            });
             $('#account_form').on('submit',function(e){
+                var page = document.getElementById('page_list').value;
                 var formdata = new FormData(this);
                 e.preventDefault();
                 $.ajaxSetup({
@@ -28,6 +58,9 @@
                             $("#text-type").find("ul").html('');
                             $("#text-type").css('display','block');
 
+                            $("#text-date").find("ul").html('');
+                            $("#text-date").css('display','block');
+
                             $("#text-list").find("ul").html('');
                             $("#text-list").css('display','block');
 
@@ -37,9 +70,12 @@
                             $("#text-description").find("ul").html('');
                             $("#text-description").css('display','block');
                             $.each(data.errors, function( key, value ) {
-                                console.log(key);
+                                // console.log(key);
                                 if (key=='type') {
                                     $("#text-type").find("ul").append('<li>'+value+'</li>');
+                                }
+                                if (key=='date') {
+                                    $("#text-date").find("ul").append('<li>'+value+'</li>');
                                 }
                                 if (key=='list') {
                                     $("#text-list").find("ul").append('<li>'+value+'</li>');
@@ -54,10 +90,13 @@
                             });
                         }else if (data.success==200){
                             $("#text-type").html('');
+                            $("#text-date").html('');
                             $("#text-list").html('');
                             $("#text-amount").html('');
                             $("#text-description").html('');
-                            console.log('inserted');
+                            $('#account_form')[0].reset();
+                            $('#formModal').modal('hide');
+                            fetch_data(page);
                         }
                     },
                     error: function(data){
@@ -65,114 +104,29 @@
                     }
                 });
             });
-        });
-        function account_save(){
-            var type = document.getElementById('type').value;
-            var list = document.getElementById('list').value;
-            var amount = document.getElementById('amount').value;
-            var description = document.getElementById('description').value;
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: '{{url("account.insert")}}' ,
-                type: "POST",
-                data: $('#account_create_form').serialize(),
-                success: function(data) {
-                    console.log(data.errors);
-                    if(data.errors.type){
-                        console.log("Errors -> Type");
-
-                    }
-                }
+            $('#btn-add').click(function (){
+                $('#formModal').modal('show');
             });
-        }
-        // function account_form(){
-        //     $.ajaxSetup({
-        //         headers: {
-        //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //         }
-        //     });
-        //     $.ajax({
-        //         url: '/account/account.form' ,
-        //         type: "POST",
 
-        //         success: function(data) {
-        //             document.getElementById('modal-title').innerHTML='Create Account';
-        //             document.getElementById('modal-body').innerHTML=data;
-        //             // console.log(data.errors);
-
-        //         }
-        //     });
-        // }
+        });
     </script>
     <div class="row">
         <div class="col-lg-10">
             <h2>Account</h2>
         </div>
         <div class="col-lg-2">
-            <button type="button" class="btn btn-secondary" id="btn-add" data-toggle="modal"  data-target="#formModal">Add</button>
+            {{-- data-toggle="modal"  data-target="#formModal" --}}
+            <button type="button" class="btn btn-secondary" id="btn-add" >Add</button>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
-        {{-- <form action="{{url('account.insert')}}" method="post">
-            @csrf
-            <div class="container">
-                <div class="row">
-                    <div class="col">
-                        <div class="form-row">
-                            <div class="form-group col-md-2">
-                                <label for="">Type </label>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <input class="form-check-input" type="radio" name="type" id="type" value="revenue">
-                                <label class="form-check-label" for="exampleRadios1">
-                                    Revenue
-                                </label>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <input class="form-check-input" type="radio" name="type" id="type" value="expenses">
-                                <label class="form-check-label" for="exampleRadios1">
-                                    Expenses
-                                </label>
-                            </div>
-                            @error('type')
-                            <span class="text-danger">{{ $errors->first('type') }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="">List </label>
-                            <input type="text" class="form-control" id="list" name="list">
-                            @error('list')
-                            <span class="text-danger">{{ $errors->first('list') }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="">Amount </label>
-                            <input type="text" class="form-control" id="amount" name="amount">
-                            @error('amount')
-                            <span class="text-danger">{{ $errors->first('amount') }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                            @error('description')
-                            <span class="text-danger">{{ $errors->first('description') }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleFormControlFile1">Receipt</label>
-                            <input type="file" class="form-control-file" id="receipt">
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form> --}}
+        <div class="col-lg-12" id="table_data">
+            @include('account.list')
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+
         </div>
     </div>
         <!-- Modal -->
@@ -183,7 +137,7 @@
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modal-title">Modal title</h5>
+                    <h5 class="modal-title" id="modal-title">Create Account</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -212,6 +166,11 @@
                                             </label>
                                         </div>
                                         <span class="text-danger" id="text-type"><ul></ul></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">Date </label>
+                                        <input type="text" class="form-control" id="date" name="date">
+                                        <span class="text-danger" id="text-date"><ul></ul></span>
                                     </div>
                                     <div class="form-group">
                                         <label for="">List </label>
