@@ -22,7 +22,6 @@ Route::group(['middleware'=>['checkauth']],function(){
     //Account
     Route::get('/account', 'AccountController@index');
     Route::match(['get', 'post'],'account.insert', 'AccountController@insert');
-    Route::match(['get', 'post'],'account.fetch_data', 'AccountController@fetch_data');
 
     //Profile
     Route::get('/profile', 'ProfileController@index');
