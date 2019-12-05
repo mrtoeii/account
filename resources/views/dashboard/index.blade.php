@@ -6,8 +6,10 @@
 @section('content')
     <div class="container-fluid">
         <div class="row">
-            <div class="col">Dashboard</div>
+            {{-- <div class="col">Dashboard</div> --}}
+            <div id="app">
+                <dashboard></dashboard>
+            </div>
         </div>
     </div>
-
 @endsection

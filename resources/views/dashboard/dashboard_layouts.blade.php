@@ -1,5 +1,6 @@
 <?php
     $session = session()->get('user');
+    // dd($session);
     $username =  $session['username'];
     $fname =  $session['fname'];
     $lname =  $session['lname'];
@@ -44,7 +45,7 @@
         }
     </script>
     <body>
-        <div id='content'>
+        {{-- <div id='content'>
             <span class="slide">
                 <a href="#" onclick="openSlideMenu()">
                     <i class="fas fa-bars"></i>
@@ -63,14 +64,26 @@
                 </ul>
             </div>
 
-        </div>
-        <div class="container">
+        </div> --}}
+        <div class="container-fluid">
             <div class="row">
-                <div class="col">
+                <div class="col-md-2">
+                    <ul>
+                        <li><a href="{{ url('dashboard') }}">Home</a></li>
+                        <li><a href="{{ url('account') }}">Account</a></li>
+                        <li><a href="{{ url('users') }}">Users</a></li>
+                        <li><a href="{{ url('profile') }}">Profile</a></li>
+                        <li><a href="{{ url('logout') }}">Log out</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-10">
                     @yield('content')
                 </div>
             </div>
         </div>
+
+
     </body>
+    <script src="{{asset('js/app.js')}}"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </html>

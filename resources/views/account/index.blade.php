@@ -119,14 +119,14 @@
             <button type="button" class="btn btn-secondary" id="btn-add" >Add</button>
         </div>
     </div>
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-lg-12" id="table_data">
             @include('account.list')
         </div>
-    </div>
+    </div> --}}
     <div class="row">
-        <div class="col-lg-12">
-
+        <div class="col-md-12" id="app">
+            <account></account>
         </div>
     </div>
         <!-- Modal -->

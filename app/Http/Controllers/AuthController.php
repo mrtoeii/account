@@ -32,13 +32,19 @@ class AuthController extends Controller
                 'fname'=>$user->fname,
                 'lname'=>$user->lname,
                 'role'=>$user->role,
+                'status' => true
             );
             session()->put('user',$userArr);
-            return redirect('/dashboard');
-
+            // return redirect('/dashboard');
+            return response()->json($userArr);
 
         }else{
-            echo 'Username or Password Incorrect';
+            // echo 'Username or Password Incorrect';
+            $data = array(
+                'status'=>'500',
+                'msg' =>'Username or Password Incorrect'
+            );
+            return response()->json($data);
         }
     }
     public function logout(Request $req){
