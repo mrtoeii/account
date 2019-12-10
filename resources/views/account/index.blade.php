@@ -116,7 +116,7 @@
         </div>
         <div class="col-lg-2">
             {{-- data-toggle="modal"  data-target="#formModal" --}}
-            <button type="button" class="btn btn-secondary" id="btn-add" >Add</button>
+            {{-- <button type="button" class="btn btn-secondary" id="btn-add" >Add</button> --}}
         </div>
     </div>
     {{-- <div class="row">
@@ -131,7 +131,7 @@
     </div>
         <!-- Modal -->
 
-    <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form id="account_form">
             @csrf
@@ -202,6 +202,6 @@
             </div>
             </form>
         </div>
-    </div>
+    </div> --}}
 
 @endsection

@@ -3,14 +3,17 @@
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
-// import Vue from 'vue'
+import Vue from 'vue'
 // import VueRouter from 'vue-router'
 
 
 // import account from './components/account/account.vue'
 // import dashboard from './components/dashboard/dashboard.vue'
 
-
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+import BootstrapVue from 'bootstrap-vue'
+Vue.use(BootstrapVue)
 // Vue.use(VueRouter)
 
 window.Vue = require('vue');

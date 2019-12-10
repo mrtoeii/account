@@ -7,13 +7,17 @@ use DB,Validator,Response;
 class AccountController extends Controller
 {
     public function index(){
-        $accounts = DB::table('accounts')->paginate(5);
-        return view('account.index', [
-            'accounts' => $accounts,
-            'perPage' => $accounts->perPage(),
-            'currentPage' => $accounts->currentPage()
-        ]);
+        return view('account.index');
     }
+
+    // public function index(){
+    //     $accounts = DB::table('accounts')->paginate(5);
+    //     return view('account.index', [
+    //         'accounts' => $accounts,
+    //         'perPage' => $accounts->perPage(),
+    //         'currentPage' => $accounts->currentPage()
+    //     ]);
+    // }
     public function fetch_data(Request $request){
         if($request->ajax()){
             $accounts = DB::table('accounts')->paginate(5);
