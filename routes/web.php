@@ -11,7 +11,7 @@
 */
 //Auth
 Route::get('/', 'AuthController@index');
-Route::post('/checklogin', 'AuthController@checklogin');
+Route::match(['get', 'post'],'/checklogin', 'AuthController@checklogin');
 Route::get('/logout', 'AuthController@logout');
 
 
@@ -23,6 +23,7 @@ Route::group(['middleware'=>['checkauth']],function(){
     Route::get('/account', 'AccountController@index');
     Route::match(['get', 'post'],'account.insert', 'AccountController@insert');
     Route::match(['get', 'post'],'account.fetch_data', 'AccountController@fetch_data');
+    Route::match(['get', 'post'],'account.testSession', 'AccountController@testSession');
 
     //Profile
     Route::get('/profile', 'ProfileController@index');

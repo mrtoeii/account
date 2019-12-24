@@ -1,12 +1,11 @@
 <template>
-
     <div class="row">
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-12">
                     <b-button v-b-modal.modal-1>Add</b-button>
                     <b-modal id="modal-1" title="Create Account" hide-footer>
-                        <form @submit.prevent="onSubmit" enctype="multipart/form-data" >
+                        <form @submit.prevent="onSubmit" enctype="multipart/form-data">
                             <b-form-group label="Type">
                                 <b-form-radio-group >
                                     <b-form-radio v-model="type"  name="type" value="revenue">Revenue</b-form-radio>
@@ -26,7 +25,7 @@
                                 <b-form-input v-model="description" ></b-form-input>
                             </b-form-group>
                             <b-form-group label="Receipt" >
-                                <b-form-file  v-on:change="onImageChange"></b-form-file>
+                                <b-form-file   v-on:change="onImageChange"></b-form-file>
                             </b-form-group>
                             <b-form-group>
                             <b-button type='submit' variant="primary">Save</b-button>
@@ -59,27 +58,49 @@
         },
         methods:{
             onImageChange(e){
-                console.log(e.target.files[0]);
-                this.receipt = e.target.files[0];
+                 let files = e.target.files || e.dataTransfer.files;
+                if (!files.length)
+                    return;
+                this.createImage(files[0]);
+            },
+            createImage(file) {
+                let reader = new FileReader();
+                let vm = this;
+                reader.onload = (e) => {
+                    vm.receipt = e.target.result;
+                };
+                reader.readAsDataURL(file);
             },
             onSubmit:function (e){
+                const config = {
+                    headers: { 'content-type': 'multipart/form-data' }
+                }
+                var data = new FormData();
+                data.append('type', this.type);
+                data.append('date', this.date);
+                data.append('list', this.list);
+                data.append('amount', this.amount);
+                data.append('description', this.description);
+                data.append('image', this.receipt);
                 // console.log(this.type);
                 // console.log(this.date);
                 // console.log(this.list);
                 // console.log(this.amount);
                 // console.log(this.description);
-                // console.log(this.receipt.name);
+                // console.log(this.receipt);
+                // {
+                //     type:this.type,
+                //     date:this.date,
+                //     list:this.list,
+                //     amount:this.amount,
+                //     description:this.description,
+                //     receipt:this.receipt,
+                // }
                 e.preventDefault();
-                let currentObj = this;
-
-                axios.post('./api/accounts',{
-                    type:this.type,
-                    date:this.date,
-                    list:this.list,
-                    amount:this.amount,
-                    description:this.description,
-                    receipt:this.receipt,
-                })
+                axios.post('./account.insert',data,config) 
+                .then(response => {
+                    console.log(response.data)
+                });
             }
         }
     }

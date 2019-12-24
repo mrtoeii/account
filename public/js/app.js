@@ -1917,7 +1917,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1931,25 +1930,50 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     onImageChange: function onImageChange(e) {
-      console.log(e.target.files[0]);
-      this.receipt = e.target.files[0];
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+      this.createImage(files[0]);
+    },
+    createImage: function createImage(file) {
+      var reader = new FileReader();
+      var vm = this;
+
+      reader.onload = function (e) {
+        vm.receipt = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
     },
     onSubmit: function onSubmit(e) {
-      // console.log(this.type);
+      var config = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
+      };
+      var data = new FormData();
+      data.append('type', this.type);
+      data.append('date', this.date);
+      data.append('list', this.list);
+      data.append('amount', this.amount);
+      data.append('description', this.description);
+      data.append('image', this.receipt); // console.log(this.type);
       // console.log(this.date);
       // console.log(this.list);
       // console.log(this.amount);
       // console.log(this.description);
-      // console.log(this.receipt.name);
+      // console.log(this.receipt);
+      // {
+      //     type:this.type,
+      //     date:this.date,
+      //     list:this.list,
+      //     amount:this.amount,
+      //     description:this.description,
+      //     receipt:this.receipt,
+      // }
+
       e.preventDefault();
-      var currentObj = this;
-      axios.post('./api/accounts', {
-        type: this.type,
-        date: this.date,
-        list: this.list,
-        amount: this.amount,
-        description: this.description,
-        receipt: this.receipt
+      axios.post('./account.insert', data, config).then(function (response) {
+        console.log(response.data);
       });
     }
   }

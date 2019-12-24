@@ -47,6 +47,10 @@ class AuthController extends Controller
             return response()->json($data);
         }
     }
+    public function getSession(Request $request){
+        // return "test getSession";
+        return $request->session()->get('user');
+    }
     public function logout(Request $req){
         $req->session()->flush();
         return  redirect('/');

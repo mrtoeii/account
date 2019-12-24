@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use DB,Validator,Response;
 class AccountController extends Controller
 {
@@ -48,11 +49,28 @@ class AccountController extends Controller
             'amount' => 'required|numeric',
             'description' => 'required',
         );
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails())
+        // $image = $request->input('image');
+        if($request->get('image'))
         {
-            return response()->json(['errors' => $validator->errors()]);
-        }else{
+           $image = $request->get('image');
+           $name = 'test.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+           echo $request->file('image')->getClientOriginalName().'<br>';
+           echo public_path('images/').$name.'<br>';
+        //    Image::make($request->get('image'))->save(public_path('images/').$name);
+         }
+ 
+     
+        
+        // if($request->hasFile('image')){
+        //      dd($request->input('image')->getClientOriginalExtension());
+        // }
+       
+        die;
+        // $validator = Validator::make($request->all(),$rules);
+        // if($validator->fails())
+        // {
+        //     return response()->json(['errors' => $validator->errors()]);
+        // }else{
             $user = session()->get('user');
 
             $type = $request->input('type');
@@ -60,6 +78,7 @@ class AccountController extends Controller
             $list = $request->input('list');
             $amount = $request->input('amount');
             $description = $request->input('description');
+            $receipt = $request->input('receipt');
             $image = '';
             if($_FILES['receipt']['size']==0 && $_FILES['receipt']['error']==4){
                 $image='null';
@@ -75,7 +94,7 @@ class AccountController extends Controller
                 'list' => $list,
                 'amount' => $amount,
                 'description' => $description,
-                'receipt'=>$image,
+                'receipt'=>$receipt ,
                 'username'=>$user['username'],
                 'status'=>0,
                 'created'=>date('d-m-Y H:i:s'),
@@ -87,6 +106,9 @@ class AccountController extends Controller
             // echo '</pre>';
             DB::table('accounts')->insert($data);
             return response()->json(['success' =>200]);
-        }
+        // }
+    }
+    function testSession(){
+        dd(session()->get('user'));
     }
 }
