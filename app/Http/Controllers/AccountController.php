@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use DB,Validator,Response;
+use DB,Validator,Response,Image;
+use PhpOption\Option;
+
 class AccountController extends Controller
 {
     public function index(){
@@ -31,40 +33,62 @@ class AccountController extends Controller
     }
 
     function Insert(Request $request){
-        function getName($n) {
+        function getName() {
             $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
             $randomString = '';
 
-            for ($i = 0; $i < $n; $i++) {
+            for ($i = 0; $i < 10; $i++) {
                 $index = rand(0, strlen($characters) - 1);
                 $randomString .= $characters[$index];
             }
 
             return $randomString;
         }
-        $rules = array(
+
+        $this->validate( $request,[
             'type' => 'required',
             'date' => 'required',
             'list' => 'required',
             'amount' => 'required|numeric',
             'description' => 'required',
+            'image' => 'mimes:jpeg,jpg,png,gif',
+        ]);
+        // return response()->json([$validator->errors()]);
+        // return $validator->errors()->all();
+        die;
+        $filename = 'no';
+        if($request->hasFile('image')){
+            $filename = $request->file('image')->hashName();
+            // dd($request->file('image')->getClientOriginalName());
+            // Image::make(request()->file('image'))->save(public_path('images/accounts/').$filename);
+        }
+        $user = session()->get('user');    
+        $type = $request->input('type');
+        $date = $request->input('date');
+        $list = $request->input('list');
+        $amount = $request->input('amount');
+        $description = $request->input('description');
+        $data = array(
+            'type' => $type,
+            'date' => $date,
+            'list' => $list,
+            'amount' => $amount,
+            'description' => $description,
+            'receipt'=>  $filename,
+            'username'=>$user['username'],
+            'status'=>0,
+            'created'=>date('d-m-Y H:i:s'),
         );
-        // $image = $request->input('image');
-        if($request->get('image'))
-        {
-           $image = $request->get('image');
-           $name = 'test.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
-           echo $request->file('image')->getClientOriginalName().'<br>';
-           echo public_path('images/').$name.'<br>';
-        //    Image::make($request->get('image'))->save(public_path('images/').$name);
-         }
- 
-     
-        
-        // if($request->hasFile('image')){
-        //      dd($request->input('image')->getClientOriginalExtension());
-        // }
        
+        // echo $filename;
+        dd($data);
+        // dd($request->all());
+        
+        // 
+        // $image = $request->input('image');
+        // $encoded_string = !empty($request->get('image')) ? $request->get('image') : 'V2ViZWFzeXN0ZXAgOik=';
+        // upload_file($image );
+        
         die;
         // $validator = Validator::make($request->all(),$rules);
         // if($validator->fails())

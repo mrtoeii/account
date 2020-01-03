@@ -5,31 +5,51 @@
                 <div class="col-md-12">
                     <b-button v-b-modal.modal-1>Add</b-button>
                     <b-modal id="modal-1" title="Create Account" hide-footer>
-                        <form @submit.prevent="onSubmit" enctype="multipart/form-data">
-                            <b-form-group label="Type">
-                                <b-form-radio-group >
-                                    <b-form-radio v-model="type"  name="type" value="revenue">Revenue</b-form-radio>
-                                    <b-form-radio v-model="type"  name="type" value="expenses">Expenses</b-form-radio>
-                                </b-form-radio-group>
-                            </b-form-group>
-                            <b-form-group label="Date" >
-                                <b-form-input v-model="date" ></b-form-input>
-                            </b-form-group>
-                            <b-form-group label="List" >
-                                <b-form-input v-model="list" ></b-form-input>
-                            </b-form-group>
-                            <b-form-group label="Amount" >
-                                <b-form-input v-model="amount" ></b-form-input>
-                            </b-form-group>
-                            <b-form-group label="Description" >
-                                <b-form-input v-model="description" ></b-form-input>
-                            </b-form-group>
-                            <b-form-group label="Receipt" >
-                                <b-form-file   v-on:change="onImageChange"></b-form-file>
-                            </b-form-group>
-                            <b-form-group>
-                            <b-button type='submit' variant="primary">Save</b-button>
-                            </b-form-group>
+                        <form @submit.prevent="onSubmit" enctype="multipart/form-data" ref="myForm">
+                            <div class="form-group">
+                                <label for="Type">Type </label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="type" id="inlineRadio1" value="revenue" v-model="type">
+                                    <label class="form-check-label" for="inlineRadio1">Revenue</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="type" id="inlineRadio2" value="expenses" v-model="type">
+                                    <label class="form-check-label" for="inlineRadio2">Expenses</label>
+                                </div>
+                                <span v-if="errors.type" class="error">{{errors.type[0]}}</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Date">Date </label>
+                                 <date-pick 
+                                    v-model="date"
+                                    :isDateDisabled="isFutureDate"
+                                 >
+                                 </date-pick>
+                                 <span v-if="errors.date" class="error">{{errors.date[0]}}</span>
+                            </div>
+                             <div class="form-group">
+                                <label for="List">List</label>
+                                <input type="text" class="form-control" v-model="list" >
+                                <span v-if="errors.list" class="error">{{errors.list[0]}}</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Amount">Amount</label>
+                                <input type="text" class="form-control" v-model="amount">
+                                <span v-if="errors.amount" class="error">{{errors.amount[0]}}</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Description">Description</label>
+                                <textarea class="form-control" rows="3" v-model="description"></textarea>
+                                <span v-if="errors.description" class="error">{{errors.description[0]}}</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Receipt</label>
+                                <input type="file" class="form-control-file" v-on:change="onImageChange">
+                                <span v-if="errors.image" class="error">{{errors.image[0]}}</span>
+                            </div>
+                            <div class="form-group">
+                               <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
                         </form>
                     </b-modal>
                 </div>
@@ -45,7 +65,10 @@
 
 </template>
 <script>
+    import DatePick from 'vue-date-pick';
+    import 'vue-date-pick/dist/vueDatePick.css';
     export default {
+        components: {DatePick},
         data(){
             return{
                 type:'',
@@ -54,24 +77,21 @@
                 amount:'',
                 description:'',
                 receipt:'',
+                errors:[]
             }
         },
         methods:{
-            onImageChange(e){
-                 let files = e.target.files || e.dataTransfer.files;
-                if (!files.length)
-                    return;
-                this.createImage(files[0]);
+           
+            isFutureDate(date) {
+                const currentDate = new Date();
+                return date > currentDate;
             },
-            createImage(file) {
-                let reader = new FileReader();
-                let vm = this;
-                reader.onload = (e) => {
-                    vm.receipt = e.target.result;
-                };
-                reader.readAsDataURL(file);
+            onImageChange(e){
+                this.receipt = e.target.files[0];
             },
             onSubmit:function (e){
+                this.errors = []
+                e.preventDefault();
                 const config = {
                     headers: { 'content-type': 'multipart/form-data' }
                 }
@@ -82,24 +102,17 @@
                 data.append('amount', this.amount);
                 data.append('description', this.description);
                 data.append('image', this.receipt);
-                // console.log(this.type);
-                // console.log(this.date);
-                // console.log(this.list);
-                // console.log(this.amount);
-                // console.log(this.description);
-                // console.log(this.receipt);
-                // {
-                //     type:this.type,
-                //     date:this.date,
-                //     list:this.list,
-                //     amount:this.amount,
-                //     description:this.description,
-                //     receipt:this.receipt,
-                // }
-                e.preventDefault();
+                // console.log(thi  s.receipt);
+                
                 axios.post('./account.insert',data,config) 
                 .then(response => {
-                    console.log(response.data)
+                    // console.log(response.data.message)
+                })
+                .catch(error=>{
+                    if(error.response.status==422){
+                        // console.log(error.response.data.errors);
+                        this.errors = error.response.data.errors
+                    }
                 });
             }
         }
