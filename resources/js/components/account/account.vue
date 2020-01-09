@@ -45,7 +45,7 @@
                             <div class="form-group">
                                 <label for="">Receipt</label>
                                 <input type="file" class="form-control-file" v-on:change="onImageChange">
-                                <span v-if="errors.image" class="error">{{errors.image[0]}}</span>
+                                <span v-if="errors.type='image'" class="error">{{errors.msg}}</span>
                             </div>
                             <div class="form-group">
                                <button type="submit" class="btn btn-primary">Save</button>
@@ -66,6 +66,7 @@
 </template>
 <script>
     import DatePick from 'vue-date-pick';
+    import Swal from 'sweetalert2'
     import 'vue-date-pick/dist/vueDatePick.css';
     export default {
         components: {DatePick},
@@ -101,18 +102,28 @@
                 data.append('list', this.list);
                 data.append('amount', this.amount);
                 data.append('description', this.description);
-                data.append('image', this.receipt);
-                // console.log(thi  s.receipt);
-                
+                data.append('image', this.receipt);                
                 axios.post('./account.insert',data,config) 
-                .then(response => {
-                    // console.log(response.data.message)
+                .then(response => { 
+                    if(response.data.status==200){
+                        Swal.fire(
+                            response.data.msg,
+                            'Added Account',
+                            'success'
+                        )
+                    }else if (response.data.status==500) {
+                        if (response.data.type=='image') {
+                            this.errors = response.data
+                        }
+                    }
+                   
                 })
                 .catch(error=>{
                     if(error.response.status==422){
                         // console.log(error.response.data.errors);
                         this.errors = error.response.data.errors
                     }
+                   
                 });
             }
         }

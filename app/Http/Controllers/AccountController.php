@@ -44,24 +44,44 @@ class AccountController extends Controller
 
             return $randomString;
         }
-
-        $this->validate( $request,[
-            'type' => 'required',
-            'date' => 'required',
-            'list' => 'required',
-            'amount' => 'required|numeric',
-            'description' => 'required',
-            'image' => 'mimes:jpeg,jpg,png,gif',
-        ]);
-        // return response()->json([$validator->errors()]);
-        // return $validator->errors()->all();
-        die;
+        $user = session()->get('user');
+        // $this->validate( $request,[
+        //     'type' => 'required',
+        //     'date' => 'required',
+        //     'list' => 'required',
+        //     'amount' => 'required|numeric',
+        //     'description' => 'required',
+        //     // 'image' => 'min:0|mimes:jpeg,jpg,png,gif',
+        // ]);
         $filename = 'no';
-        if($request->hasFile('image')){
-            $filename = $request->file('image')->hashName();
-            // dd($request->file('image')->getClientOriginalName());
-            // Image::make(request()->file('image'))->save(public_path('images/accounts/').$filename);
+        $path = public_path('images/accounts/').$user['username'].'/';
+        if(!is_dir($path)) //create the folder if it's not already exists
+        {
+          mkdir($path,0755,TRUE);
         }
+        $arr_extension = array('png', 'jpg', 'jpeg', 'gif');
+        if($request->hasFile('image')){
+            // dd($request->image->path());
+            $extension = $request->image->extension();
+            if(!in_array($extension, $arr_extension)){
+                return response()->json([
+                    'status' =>500,
+                    'type'=>'image',
+                    'msg'=>'Invalid file extension. Only png, jpg, jpeg, gif'
+                ]);
+            }else{
+                if(file_exists($path.$filename)) {
+                    $filename = $request->file('image')->hashName();
+                }else{
+                    $filename = $request->file('image')->hashName();
+                }
+                // dd($request->file('image')->getClientOriginalExtension());
+                // Image::make(request()->file('image'))->save($path.$filename);
+            }
+            
+        }
+        return response()->json(['status' =>200,'msg'=>'Success']);
+        die;
         $user = session()->get('user');    
         $type = $request->input('type');
         $date = $request->input('date');
@@ -76,61 +96,12 @@ class AccountController extends Controller
             'description' => $description,
             'receipt'=>  $filename,
             'username'=>$user['username'],
-            'status'=>0,
-            'created'=>date('d-m-Y H:i:s'),
+            'remove_status'=>0,
+            'created'=>date('Y-m-d H:i:s'),
         );
-       
-        // echo $filename;
-        dd($data);
-        // dd($request->all());
-        
-        // 
-        // $image = $request->input('image');
-        // $encoded_string = !empty($request->get('image')) ? $request->get('image') : 'V2ViZWFzeXN0ZXAgOik=';
-        // upload_file($image );
-        
-        die;
-        // $validator = Validator::make($request->all(),$rules);
-        // if($validator->fails())
-        // {
-        //     return response()->json(['errors' => $validator->errors()]);
-        // }else{
-            $user = session()->get('user');
-
-            $type = $request->input('type');
-            $date = $request->input('date');
-            $list = $request->input('list');
-            $amount = $request->input('amount');
-            $description = $request->input('description');
-            $receipt = $request->input('receipt');
-            $image = '';
-            if($_FILES['receipt']['size']==0 && $_FILES['receipt']['error']==4){
-                $image='null';
-            }else{
-                // echo '<pre>';
-                // print_r($_FILES);
-                // echo '</pre>';
-                $image=getName(10);
-            }
-            $data = array(
-                'type' => $type,
-                'date' => $date,
-                'list' => $list,
-                'amount' => $amount,
-                'description' => $description,
-                'receipt'=>$receipt ,
-                'username'=>$user['username'],
-                'status'=>0,
-                'created'=>date('d-m-Y H:i:s'),
-                'updated'=>'no',
-            );
-
-            // echo '<pre>';
-            // print_r($data);
-            // echo '</pre>';
-            DB::table('accounts')->insert($data);
-            return response()->json(['success' =>200]);
-        // }
+        if(DB::table('accounts')->insert($data)){
+            return response()->json(['status' =>200,'msg'=>'Success']);
+        }  
     }
     function testSession(){
         dd(session()->get('user'));
